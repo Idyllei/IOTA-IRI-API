@@ -12,6 +12,8 @@ namespace IOTA_IRI_API.Json
         public List<string> hashes { get; set; }
         public int duration { get; set; }
 
+        public static string cmd = "\"command\": \"getTips\"";
+
         public static void Display(byte[] data)
         {
             if (data == null)

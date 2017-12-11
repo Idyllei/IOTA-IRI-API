@@ -11,59 +11,14 @@ namespace IOTA_IRI_API
 {
     class Program
     {
-        public class RequestsClass
-        {
-            //this will all be removed soon
-            public string getNodeInfo { get; set; }
-            public string getNeighbors { get; set; }
-            public string addNeighbors { get; set; }
-            public string removeNeighbors { get; set; }
-            public string getTips { get; set; }
-            public string findTransactions { get; set; }
-            public string getTrytes { get; set; }
-            public string getInclusionStates { get; set; }
-            public string getBalances { get; set; }
-            public string getTransactionsToApprove { get; set; }
-            public string attachToTangle { get; set; }
-            public string interruptAttachingToTangle { get; set; }
-            public string broadcastTransactions { get; set; }
-            public string storeTransactions { get; set; }
-            //I'm covering it in gasoline.
-            //public Dictionary<int, string> Requests { get; set; }
-
-            /*
-             * remainder for tomrow collapse json files into signle fiel and nest classes or list or somethin 
-             * 
-             */
-
-            public RequestsClass()
-            {
-                getNodeInfo = "\"command\": \"getNodeInfo\"";
-                getNeighbors = "\"command\": \"getNeighbors\"";
-                addNeighbors = "\"command\": \"addNeighbors\", \"uris\": [{0}]";
-                removeNeighbors = "\"command\": \"removeNeighbors\", \"uris\": [{0}]";
-                getTips = "\"command\": \"getTips\"";
-                findTransactions = "\"command\": \"findTransactions\", \"addresses\": [{0}]";
-                getTrytes = "\"command\": \"getTrytes\", \"hashes\": [{0}]";
-                getInclusionStates = "\"command\": \"getInclusionStates\", \"transactions\": [{0}], \"tips\": [{1}]";
-                getBalances = "\"command\": \"getBalances\", \"addresses\": [{0}], \"threshold\": 100";
-                getTransactionsToApprove = "\"command\": \"getTransactionsToApprove\", \"depth\": {0}";
-                attachToTangle = "\"command\": \"attachToTangle\", \"trunkTransaction\": {0}, \"branchTransaction\": {1}, \"minWeightMagnitude\": {2}, \"trytes\": [{3}]";
-                interruptAttachingToTangle = ""; //empty POST will do the trick.
-                broadcastTransactions = "\"command\": \"broadcastTransactions\", \"trytes\": [{0}]";
-                storeTransactions = "\"command\": \"storeTransactions\", \"trytes\": [{0}]";
-            }
-        }
-        //public static RequestsClass Requests = new RequestsClass();
         private static string NodeIP;
-        private static Int16 NodePort;
+        private static UInt16 NodePort; //HEY IDIOT DONT USE SIGNED 16-BIT INTEGERS FOR PORTS
 
         static void Main(string[] args)
         {
-            string[] _cmd_args;
-            //string cmd;
+            string[] _cmd;
 
-            ClearConsolas(); //This will print out the stupid welcome message at the top so I don't have to keep pasting the crap everywhere.
+            ClearConsolas();
 
             while (true)
             {
@@ -72,28 +27,28 @@ namespace IOTA_IRI_API
                 while (true)
                 {
                     Console.Write("Please enter your Node IP>");
-                    _cmd_args = Console.ReadLine().ToLower().Split(' ');
+                    _cmd = Console.ReadLine().ToLower().Split(' ');
 
-                    if (_cmd_args[0] == "!resolv" || _cmd_args[0] == "!resolve")
+                    if (_cmd[0] == "!resolv" || _cmd[0] == "!resolve")
                     {
-                        if (string.IsNullOrEmpty(_cmd_args[1]) || !_cmd_args[1].Contains("."))
+                        if (string.IsNullOrEmpty(_cmd[1]) || !_cmd[1].Contains("."))
                             Console.WriteLine("Invalid input.");
                         else
                         {
-                            NodeIP = _cmd_args[1];
+                            NodeIP = _cmd[1];
                             break;
                         }
                     }
-                    else if (_cmd_args[0] == "!local" || _cmd_args[0] == "!localhost")
+                    else if (_cmd[0] == "!local" || _cmd[0] == "!localhost")
                     {
                         NodeIP = "127.0.0.1";
                         break;
                     }
                     else
                     {
-                        if (Regex.IsMatch(_cmd_args[0], @"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"))
+                        if (Regex.IsMatch(_cmd[0], @"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"))
                         {
-                            NodeIP = _cmd_args[0];
+                            NodeIP = _cmd[0];
                             break;
                         }
                         else
@@ -105,20 +60,21 @@ namespace IOTA_IRI_API
                 {
                     Console.WriteLine("!def for default port of 14265");
                     Console.Write("Please enter your Nodes port>");
-                    _cmd_args = Console.ReadLine().ToLower().Split(' ');
-                    if (_cmd_args[0] == "!def" || _cmd_args[0] == "!default")
+                    _cmd = Console.ReadLine().ToLower().Split(' ');
+
+                    if (_cmd[0] == "!def" || _cmd[0] == "!default")
                     {
                         NodePort = 14265;
                         break;
                     }
-                    else if (_cmd_args[0] == "!l")
+                    else if (_cmd[0] == "!l")
                     {
                         NodePort = 14421;
                         break;
                     }
                     else
                     {
-                        try { NodePort = Convert.ToInt16(_cmd_args[0]); break; }
+                        try { NodePort = Convert.ToUInt16(_cmd[0]); break; }
                         catch { Console.WriteLine("Invalid port."); continue; }
                     }
                 }
@@ -136,9 +92,9 @@ namespace IOTA_IRI_API
             {
                 Console.Write(">");
 
-                _cmd_args = Console.ReadLine().ToLower().Split(new char[] { ' '}, 2);
+                _cmd = Console.ReadLine().ToLower().Split(new char[] { ' '}, 2);
 
-                switch (_cmd_args[0])
+                switch (_cmd[0])
                 {
                     case "!clear":
                         ClearConsolas();
@@ -195,8 +151,10 @@ storetransactions - Store transactions into the local storage. The trytes to be 
                         break;
                     case "addneighbors":
                         //SendCmd(, 1, _cmd_args[1]);
+                        Json.addNeighbors.Display(SendCmd(string.Format(Json.addNeighbors.cmd, _cmd[1])));
                         break;
                     case "removeneighbors":
+                        Json.removeNeighbors.Display(SendCmd(string.Format(Json.removeNeighbors.cmd, _cmd[1])));
                         //SendCmd(Requests.removeNeighbors);
                         break;
                     case "gettips":
@@ -215,10 +173,10 @@ storetransactions - Store transactions into the local storage. The trytes to be 
                         //SendCmd(Requests.getBalances);
                         break;
                     case "gettransactionstoapprove":
-                        Json.getTransactionsToApprove.Display(SendCmd(string.Format("\"command\": \"getTransactionsToApprove\", \"depth\": {0}", _cmd_args[1])));
+                        Json.getTransactionsToApprove.Display(SendCmd(string.Format("\"command\": \"getTransactionsToApprove\", \"depth\": {0}", _cmd[1])));
                         break;
                     case "attachtotangle":
-                        Json.attachToTangle.Display(SendCmd(Json.attachToTangle.cmd, 4, _cmd_args[1]));
+                        Json.attachToTangle.Display(SendCmd(Json.attachToTangle.cmd, 4, _cmd[1]));
                         break;
                     case "interruptattachingtotangle":
                         //SendCmd(Requests.interruptAttachingToTangle);
@@ -235,13 +193,8 @@ storetransactions - Store transactions into the local storage. The trytes to be 
                 }
             }
         }
-        
-        /* * Normal removal of nbags are integres removen 1 2 3 4 and it will first pull getneighbours() and assign them integers while listing the integeres to the user.
-         * I was obviously really fucked when I wrote this I don't know what the hell it means. leaving it to try and figure out later.
-         * I don't even want to think about how many times I've refactored or completely rewritten this trying to get it to work. Me no smart.
-         */
 
-        private static bool Validate_Node()
+        private static bool Validate_Node() //used to check if API calls can be made when first entering IP:Port credentials.
         {
             bool Accessible = false;
 
@@ -252,7 +205,7 @@ storetransactions - Store transactions into the local storage. The trytes to be 
                     byte[] Returned = wc.UploadData(string.Format("http://{0}:{1}", NodeIP, NodePort), "POST", Encoding.Default.GetBytes("{" + Json.getNeighbors.cmd + "}"));
                     Accessible = true;
                 }
-                catch { Accessible = false; }
+                catch { }
             }
 
             return Accessible;
@@ -281,16 +234,19 @@ storetransactions - Store transactions into the local storage. The trytes to be 
                 return null;
             }
 
-            if(args != null)
+            if (args != null)
             {
                 /*
                  * I really hate my mouse. double clicking piece of junk
                  * 
                  * This is very shaky and brutal to look at trying to handle user input to single, multiple args for multiple parameters
                  * Currently need to make it so it doesn't wrap integres in qoutations like "18" otherwise the API says no
+                 * 
+                 * I KNOW there is an easier way I just can't see it right now. :(
                  */
+
                 List<string> Params = new List<string>(args.Split(' '));
-                if(Params.Count < required)
+                if (Params.Count < required)
                 {
                     Console.WriteLine("Required parameters not met! type !API for list of API commands with their parameters.");
                     return null;
@@ -309,7 +265,7 @@ storetransactions - Store transactions into the local storage. The trytes to be 
 
                     for (int i = 0; i < c; i++)
                     {//stuffing args from params
-                        if (i == c-1)
+                        if (i == c - 1)
                             sb.Append("\"{" + internalc + "}\"");
                         else
                             sb.Append("\"{" + internalc + "}\", ");
@@ -320,30 +276,14 @@ storetransactions - Store transactions into the local storage. The trytes to be 
                 }
 
 
-                string[] _f = new string[Stuffed.Count]; //3
+                string[] _f = new string[Stuffed.Count];
 
                 for (int i = 0; i < Stuffed.Count; i++)
                     _f[i] = Stuffed[i];
-                    /*for (int i = 0; i < args.Length; i++)
-                    {
-                        _f = _f + "{" + i + "}";
-                    }*/
 
-                    //cmd = string.Format(cmd, _f);       //WHAT THE FUCK AM i DOING
-                    //cmd = string.Format(cmd, args);
-
-                //for (int i = 0; i < required; i++)
-                //{
-                    //cmd = string.Format(cmd, _f);
-                    //cmd = string.Format(string.Format(cmd, _f), Params[i].Split(',')); //1, 2 WHERE THE FUCK IS 3 4?! is what the program wants to know.
                 cmd = string.Format(cmd, _f);
-                //Console.WriteLine(cmd);
-                //Console.WriteLine(args.Replace(" ", "").Split(',').Length);
-                //foreach (string s in args.Split(','))
-                    //Console.WriteLine(">>" + s);
-                //Console.ReadLine();
-                    cmd = string.Format(cmd, args.Replace(" ", ",").Split(','));
-                //}
+
+                cmd = string.Format(cmd, args.Replace(" ", ",").Split(','));
             }
 
             using(WebClient wc = new WebClient())

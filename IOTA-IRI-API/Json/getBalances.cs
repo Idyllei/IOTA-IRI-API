@@ -14,6 +14,8 @@ namespace IOTA_IRI_API.Json
         public string milestone { get; set; }
         public int milestoneIndex { get; set; }
 
+        public static string cmd = "\"command\": \"getBalances\", \"addresses\": [{0}], \"threshold\": 100";
+
         public static void Display(byte[] data)
         {
             if (data == null)

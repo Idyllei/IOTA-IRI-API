@@ -11,6 +11,8 @@ namespace IOTA_IRI_API.Json
     {
         public List<string> trytes { get; set; }
 
+        public static string cmd = "\"command\": \"getTrytes\", \"hashes\": [{0}]";
+
         public static void Display(byte[] data)
         {
             if (data == null)
